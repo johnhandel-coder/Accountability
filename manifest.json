@@ -2,7 +2,7 @@
   "name": "the U",
   "short_name": "the U",
   "description": "Accountability companion for pursuing purity",
-  "start_url": "/index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
