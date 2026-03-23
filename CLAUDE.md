@@ -1,0 +1,108 @@
+# the U — Accountability App
+
+## Overview
+"the U" is a mobile-first HTML/CSS/JS web app that helps users break free from porn addiction through accountability, scripture, daily tracking, and milestone badges.
+
+## Branding
+- **Name:** the U
+- **Logo:** Circular black badge with white condensed text — "the" in lowercase light weight, "U" in bold uppercase
+- **Design language:** Dark, minimal, bold. Inspired by the logo's aesthetic.
+- **Color scheme:** Pure black background (#0a0a0a), white text, minimal color accents (green for success, red for falls, gold for badges)
+- **Typography:** Inter font, heavy weights (700-900), uppercase headings, wide letter-spacing
+
+## Tech Stack
+- **Single-page HTML app** — all code in `index.html` (inline CSS + JS)
+- **No backend** — localStorage under key `theu_data`
+- **PWA-ready** — `manifest.json` for home screen install
+- **Mobile-first** — safe-area-inset support for iPhone notch
+
+## App Structure (Screens)
+All screens are `<div class="screen">` toggled via JS:
+
+1. **Setup Screen** (`#setup-screen`) — 3-step onboarding:
+   - Step 1: Welcome with "the U" logo
+   - Step 2: Add accountability partners (name + phone)
+   - Step 3: Enter name and "why" statement
+
+2. **Dashboard** (`#dashboard-screen`):
+   - Greeting + streak counter
+   - **SOS Button** — pulsing circle, opens SOS modal
+   - **Check-in** — two buttons: ✓ "Stayed Pure" and ✗ "I Fell"
+     - Each triggers an encouragement message (slide-down banner)
+     - Clean check-ins: victory encouragements
+     - Falls: grace encouragements (no condemnation)
+   - Next badge progress card
+
+3. **Calendar** (`#calendar-screen`):
+   - Stats: current streak, best streak, total clean days
+   - Monthly grid — tap to cycle: empty → clean (green ✓) → fell (red ✗) → empty
+   - Navigate months with arrows
+
+4. **Badges** (`#badges-screen`):
+   - Grid of 11 milestones based on consecutive clean days
+   - Earned badges glow gold; locked badges are dimmed
+   - Badge popup appears when a new milestone is hit
+
+5. **Settings** (`#settings-screen`):
+   - Edit name and "why"
+   - Manage partners
+   - Reset all data
+
+6. **SOS Modal** (`#sos-modal`):
+   - Random Bible verse (20 curated, purity/temptation themed)
+   - User's "why" statement
+   - "Text My Partner" — opens native SMS via `sms:` protocol
+
+## Badge Milestones
+| Badge | Days | Icon |
+|-------|------|------|
+| First Step | 1 | 🌱 |
+| 3 Day Warrior | 3 | ⚔️ |
+| One Week | 7 | 🔥 |
+| Two Weeks | 14 | 💪 |
+| Three Weeks | 21 | 🛡️ |
+| One Month | 30 | ⭐ |
+| Two Months | 60 | 🌟 |
+| Three Months | 90 | 👑 |
+| Six Months | 180 | 🏔️ |
+| Nine Months | 270 | 🦅 |
+| One Year | 365 | 🏆 |
+
+## Data Model (`localStorage` key: `theu_data`)
+```json
+{
+  "setupComplete": true,
+  "userName": "string",
+  "userWhy": "string",
+  "partners": [{ "name": "string", "phone": "string" }],
+  "checkedDays": { "YYYY-MM-DD": "clean" | "fell" },
+  "earnedBadges": { "day1": true },
+  "shownBadges": { "day1": true }
+}
+```
+
+Note: `checkedDays` values changed from `true` to `"clean"` | `"fell"` to support the ✓/✗ check-in system.
+
+## Key Design Decisions
+- **SMS via `sms:` protocol** — no backend needed
+- **Check-in has two options** — ✓ (stayed pure) and ✗ (I fell), with different encouragement messages for each
+- **Encouragement system** — 10 victory messages, 8 grace messages (for falls — no shame, only grace)
+- **Badges earned on streak** — consecutive clean days, popup celebration when earned
+- **Calendar tri-state** — days cycle through: unchecked → clean → fell → unchecked
+- **No Google Fonts dependency for logo** — logo is pure CSS text
+
+## File Inventory
+| File | Purpose |
+|------|---------|
+| `index.html` | Entire app (HTML + CSS + JS) |
+| `manifest.json` | PWA manifest for home screen install |
+| `CLAUDE.md` | This file — project context for AI assistance |
+
+## Future Enhancement Ideas
+- Service worker for offline support
+- App icons (icon-192.png, icon-512.png)
+- Text all partners (currently first partner only)
+- Daily reminder notifications
+- Journal/notes feature
+- Export/share streak data
+- Animated confetti on badge earn

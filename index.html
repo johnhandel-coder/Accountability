@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>the U</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #141414;
+      --bg-card-hover: #1a1a1a;
+      --bg-elevated: #1e1e1e;
+      --white: #ffffff;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-tertiary: rgba(255,255,255,0.25);
+      --border: rgba(255,255,255,0.08);
+      --accent: #ffffff;
+      --success: #4ade80;
+      --success-dim: rgba(74,222,128,0.12);
+      --danger: #f87171;
+      --danger-dim: rgba(248,113,113,0.12);
+      --gold: #fbbf24;
+      --gold-dim: rgba(251,191,36,0.12);
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Screens ── */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: calc(var(--safe-top) + 16px) 20px calc(var(--safe-bottom) + 100px);
+      animation: fadeIn 0.4s ease;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248,113,113,0.2); }
+      50% { transform: scale(1.03); box-shadow: 0 0 40px 8px rgba(248,113,113,0.15); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes badgePop {
+      0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+      60% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    @keyframes checkPop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-80px) rotate(360deg); opacity: 0; }
+    }
+
+    /* ── Typography — bold, condensed feel ── */
+    h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; }
+    h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+    h3 { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .subtitle { color: var(--text-secondary); font-size: 14px; font-weight: 400; margin-top: 6px; line-height: 1.6; text-transform: none; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    /* ── Inputs ── */
+    .input-group { margin-bottom: 18px; }
+    .input-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .input-group input, .input-group textarea {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .input-group input:focus, .input-group textarea:focus {
+      border-color: rgba(255,255,255,0.3);
+    }
+    .input-group textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
+    .input-group input::placeholder, .input-group textarea::placeholder { color: var(--text-tertiary); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 16px 24px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-user-select: none;
+      user-select: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: var(--white);
+      color: #0a0a0a;
+    }
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-small {
+      width: auto;
+      padding: 10px 18px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+    .btn-success {
+      background: var(--success);
+      color: #0a0a0a;
+    }
+
+    /* ── Partner chips ── */
+    .partner-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .partner-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      animation: slideUp 0.3s ease;
+    }
+    .partner-chip .info { display: flex; flex-direction: column; }
+    .partner-chip .name { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .partner-chip .phone { font-size: 13px; color: var(--text-secondary); }
+    .partner-chip .remove {
+      width: 32px; height: 32px;
+      background: var(--danger-dim);
+      border: none;
+      border-radius: 8px;
+      color: var(--danger);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Logo ── */
+    .logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px; display: block; }
+    .logo-sm { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .logo-md { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 14px; display: block; }
+
+    /* ── SOS Button ── */
+    .sos-container { text-align: center; margin: 28px 0; }
+    .sos-btn {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      border: 3px solid var(--danger);
+      background: var(--bg);
+      color: var(--danger);
+      font-family: inherit;
+      cursor: pointer;
+      animation: pulse 3s ease-in-out infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin: 0 auto;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .sos-btn:active { transform: scale(0.93); animation: none; }
+    .sos-btn .sos-icon { font-size: 32px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+    .sos-btn .sos-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+
+    /* ── Streak ── */
+    .streak-display { text-align: center; padding: 16px 0; }
+    .streak-number {
+      font-size: 72px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -3px;
+    }
+    .streak-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* ── Check-in ── */
+    .checkin-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .checkin-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 20px 12px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--text-primary);
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .checkin-btn:active { transform: scale(0.96); }
+    .checkin-btn .checkin-icon { font-size: 32px; }
+    .checkin-btn .checkin-text { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .checkin-btn.success-btn { border-color: rgba(74,222,128,0.3); }
+    .checkin-btn.success-btn:hover { background: var(--success-dim); border-color: var(--success); }
+    .checkin-btn.fail-btn { border-color: rgba(248,113,113,0.2); }
+    .checkin-btn.fail-btn:hover { background: var(--danger-dim); border-color: var(--danger); }
+    .checkin-done {
+      text-align: center;
+      padding: 16px;
+      animation: fadeIn 0.4s ease;
+    }
+    .checkin-done .done-icon { font-size: 36px; animation: checkPop 0.4s ease; }
+    .checkin-done .done-text { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5; }
+
+    /* ── Encouragement toast ── */
+    .encouragement {
+      position: fixed;
+      top: calc(var(--safe-top) + 16px);
+      left: 16px;
+      right: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      z-index: 200;
+      transform: translateY(-120%);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+    }
+    .encouragement.show { transform: translateY(0); }
+    .encouragement .enc-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .encouragement .enc-title.green { color: var(--success); }
+    .encouragement .enc-title.red { color: var(--danger); }
+    .encouragement .enc-msg { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ── Calendar ── */
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .calendar-nav {
+      width: 36px; height: 36px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+    .calendar-day-label {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 0;
+    }
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      color: var(--text-secondary);
+    }
+    .calendar-day.empty { cursor: default; }
+    .calendar-day.today {
+      border: 2px solid var(--white);
+      color: var(--text-primary);
+      font-weight: 800;
+    }
+    .calendar-day.checked {
+      background: var(--success);
+      color: #0a0a0a;
+      font-weight: 800;
+    }
+    .calendar-day.checked::after {
+      content: '✓';
+      position: absolute;
+      bottom: 1px;
+      right: 3px;
+      font-size: 7px;
+    }
+    .calendar-day.failed {
+      background: var(--danger-dim);
+      color: var(--danger);
+      font-weight: 700;
+    }
+    .calendar-day.failed::after {
+      content: '✗';
+      position: absolute;
+      bottom: 1px;
+      right: 3px;
+      font-size: 7px;
+    }
+    .calendar-day.future { opacity: 0.2; cursor: default; }
+
+    /* ── Badges ── */
+    .badges-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 16px 8px;
+      border-radius: 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: all 0.3s;
+    }
+    .badge-item.earned {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+    }
+    .badge-item.locked { opacity: 0.35; }
+    .badge-icon { font-size: 32px; margin-bottom: 6px; }
+    .badge-name { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); }
+    .badge-item.earned .badge-name { color: var(--gold); }
+    .badge-days { font-size: 9px; color: var(--text-tertiary); margin-top: 2px; }
+
+    /* ── Badge Popup ── */
+    .badge-popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    .badge-popup-overlay.active { display: flex; }
+    .badge-popup {
+      text-align: center;
+      animation: badgePop 0.6s ease;
+    }
+    .badge-popup .big-icon { font-size: 80px; }
+    .badge-popup h2 { margin-top: 16px; color: var(--gold); font-size: 22px; }
+    .badge-popup .badge-desc { color: var(--text-secondary); font-size: 14px; margin-top: 8px; line-height: 1.5; }
+    .badge-popup .btn { margin-top: 28px; max-width: 200px; margin-left: auto; margin-right: auto; }
+
+    /* ── Modal / Overlay ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 20px;
+      padding-bottom: calc(var(--safe-bottom) + 20px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.4s ease;
+    }
+    .modal .verse {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.7;
+      font-style: italic;
+      color: var(--text-primary);
+      margin: 20px 0;
+      padding: 18px;
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--white);
+      border-radius: 0 12px 12px 0;
+    }
+    .modal .verse-ref {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-style: normal;
+      display: block;
+      margin-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .modal .reason {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      padding: 16px;
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--success);
+      border-radius: 0 12px 12px 0;
+      margin: 16px 0;
+    }
+    .modal .reason-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--success);
+      margin-bottom: 8px;
+    }
+
+    /* ── Bottom Nav ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0 calc(var(--safe-bottom) + 6px);
+      z-index: 50;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-family: inherit;
+      font-size: 9px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 16px;
+      transition: color 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .nav-item.active { color: var(--white); }
+    .nav-item .nav-icon { font-size: 22px; }
+
+    /* ── Misc ── */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+    .text-center { text-align: center; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+
+    .step-indicator {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+    .step-dot.active {
+      background: var(--white);
+      width: 24px;
+      border-radius: 4px;
+    }
+    .step-dot.done { background: var(--success); }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--text-tertiary);
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+
+    .toast {
+      position: fixed;
+      top: calc(var(--safe-top) + 16px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--white);
+      color: var(--bg);
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      z-index: 200;
+      transition: transform 0.4s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+    .stat-item .stat-num {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+    .stat-item .stat-label {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════ SETUP ═══════ -->
+<div id="setup-screen" class="screen active">
+
+  <!-- Step 1 -->
+  <div id="setup-step-1" class="setup-step">
+    <div style="text-align:center; padding:50px 0 30px;">
+      <img src="U logo.jpg" alt="the U" class="logo">
+      <h1 style="font-size:28px; margin-top:12px;">Accountability</h1>
+      <p class="subtitle" style="max-width:280px; margin:10px auto 0;">Your journey to freedom and purity starts here.</p>
+    </div>
+
+    <div class="step-indicator">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="mb-8">Welcome, Warrior</h3>
+      <p class="subtitle">This app will help you stay accountable, track your progress, and stay rooted in God's Word.</p>
+    </div>
+
+    <button class="btn btn-primary mt-24" onclick="goToSetupStep(2)">Get Started</button>
+  </div>
+
+  <!-- Step 2: Partners -->
+  <div id="setup-step-2" class="setup-step" style="display:none;">
+    <h2 class="mb-8">Partners</h2>
+    <p class="subtitle mb-24">Add people who will walk this road with you.</p>
+
+    <div class="step-indicator">
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <div class="card">
+      <div class="input-group">
+        <label>Name</label>
+        <input type="text" id="partner-name" placeholder="e.g. John">
+      </div>
+      <div class="input-group">
+        <label>Phone</label>
+        <input type="tel" id="partner-phone" placeholder="e.g. 555-123-4567">
+      </div>
+      <button class="btn btn-primary btn-small" onclick="addPartner()">+ Add Partner</button>
+    </div>
+
+    <div id="partner-list" class="partner-list"></div>
+    <div id="partner-empty" class="empty-state">
+      <div class="icon">👥</div>
+      <p>No partners yet</p>
+    </div>
+
+    <button class="btn btn-primary mt-24" onclick="goToSetupStep(3)" id="step2-next" disabled>Continue</button>
+  </div>
+
+  <!-- Step 3: Your Why -->
+  <div id="setup-step-3" class="setup-step" style="display:none;">
+    <h2 class="mb-8">Your Why</h2>
+    <p class="subtitle mb-24">Why do you want to pursue purity? This will anchor you in weak moments.</p>
+
+    <div class="step-indicator">
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+    </div>
+
+    <div class="card">
+      <div class="input-group">
+        <label>Your Name</label>
+        <input type="text" id="user-name" placeholder="What should we call you?">
+      </div>
+      <div class="input-group">
+        <label>Why Purity?</label>
+        <textarea id="user-why" placeholder="Be honest. This is for you.&#10;&#10;e.g. I want to honor God, be fully present for my family, and live without shame..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-primary mt-24" onclick="completeSetup()" id="setup-finish" disabled>Finish Setup</button>
+  </div>
+</div>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div id="dashboard-screen" class="screen">
+  <div style="display:flex; align-items:center; justify-content:space-between;">
+    <div>
+      <h1 id="greeting" style="font-size:24px;">The U</h1>
+      <p class="subtitle" id="today-date" style="margin-top:2px;"></p>
+    </div>
+    <img src="U logo.jpg" alt="the U" class="logo-sm">
+  </div>
+
+  <!-- Streak -->
+  <div class="card mt-24">
+    <div class="streak-display">
+      <div class="streak-number" id="streak-count">0</div>
+      <div class="streak-label">Day Streak</div>
+    </div>
+  </div>
+
+  <!-- SOS -->
+  <div class="sos-container">
+    <button class="sos-btn" onclick="triggerSOS()">
+      <span class="sos-icon">SOS</span>
+      <span class="sos-label">I'm Struggling</span>
+    </button>
+  </div>
+
+  <!-- Check-in -->
+  <div class="card" id="checkin-card">
+    <h3>Today's Check-In</h3>
+    <p class="subtitle" id="checkin-subtitle">Did you stay pure today?</p>
+    <div id="checkin-area">
+      <div class="checkin-buttons">
+        <button class="checkin-btn success-btn" onclick="checkIn(true)">
+          <span class="checkin-icon">✓</span>
+          <span class="checkin-text">Stayed Pure</span>
+        </button>
+        <button class="checkin-btn fail-btn" onclick="checkIn(false)">
+          <span class="checkin-icon">✗</span>
+          <span class="checkin-text">I Fell</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Next Badge -->
+  <div class="card" id="next-badge-card" style="display:none;">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span id="next-badge-icon" style="font-size:28px;"></span>
+      <div>
+        <h3 id="next-badge-name" style="font-size:13px;"></h3>
+        <p class="subtitle" id="next-badge-info" style="margin-top:2px; font-size:12px;"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ CALENDAR ═══════ -->
+<div id="calendar-screen" class="screen">
+  <h1 class="mb-8" style="font-size:24px;">Calendar</h1>
+  <p class="subtitle mb-24">Your journey, day by day.</p>
+
+  <div class="card">
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-num" id="cal-current-streak">0</div>
+        <div class="stat-label">Current</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="cal-best-streak">0</div>
+        <div class="stat-label">Best</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="cal-total-days">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="calendar-header">
+      <button class="calendar-nav" onclick="changeMonth(-1)">‹</button>
+      <h3 id="calendar-month-label" style="text-transform:none;"></h3>
+      <button class="calendar-nav" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════ BADGES ═══════ -->
+<div id="badges-screen" class="screen">
+  <h1 class="mb-8" style="font-size:24px;">Badges</h1>
+  <p class="subtitle mb-24">Milestones on your journey to freedom.</p>
+  <div class="badges-grid" id="badges-grid"></div>
+</div>
+
+<!-- ═══════ SETTINGS ═══════ -->
+<div id="settings-screen" class="screen">
+  <h1 class="mb-8" style="font-size:24px;">Settings</h1>
+  <p class="subtitle mb-24">Manage your profile.</p>
+
+  <div class="card">
+    <h3 class="mb-16">Profile</h3>
+    <div class="input-group">
+      <label>Your Name</label>
+      <input type="text" id="settings-name">
+    </div>
+    <div class="input-group">
+      <label>Your "Why"</label>
+      <textarea id="settings-why"></textarea>
+    </div>
+    <button class="btn btn-primary btn-small" onclick="saveProfile()">Save</button>
+  </div>
+
+  <div class="card">
+    <h3 class="mb-16">Partners</h3>
+    <div id="settings-partner-list" class="partner-list"></div>
+    <div class="divider"></div>
+    <div class="input-group">
+      <label>Add Partner</label>
+      <input type="text" id="settings-partner-name" placeholder="Name" style="margin-bottom:8px;">
+      <input type="tel" id="settings-partner-phone" placeholder="Phone number">
+    </div>
+    <button class="btn btn-primary btn-small" onclick="addPartnerFromSettings()">+ Add</button>
+  </div>
+
+  <div class="card">
+    <h3 class="mb-8">Reset</h3>
+    <p class="subtitle mb-16">Erase all data and start over. Cannot be undone.</p>
+    <button class="btn btn-danger btn-small" onclick="resetApp()">Reset Everything</button>
+  </div>
+</div>
+
+<!-- ═══════ SOS MODAL ═══════ -->
+<div class="modal-overlay" id="sos-modal">
+  <div class="modal">
+    <div class="text-center mb-16">
+      <img src="U logo.jpg" alt="the U" class="logo-md">
+      <h2>Stay Strong</h2>
+      <p class="subtitle">You reached out. That takes courage.</p>
+    </div>
+
+    <div class="verse" id="sos-verse">
+      <span id="sos-verse-text"></span>
+      <span class="verse-ref" id="sos-verse-ref"></span>
+    </div>
+
+    <div class="reason">
+      <div class="reason-label">Remember Your Why</div>
+      <div id="sos-reason"></div>
+    </div>
+
+    <button class="btn btn-primary mb-16" id="sos-text-btn" onclick="sendSOSText()">Text My Partner</button>
+    <button class="btn btn-outline" onclick="closeSOSModal()">I'm Okay Now</button>
+  </div>
+</div>
+
+<!-- ═══════ BADGE POPUP ═══════ -->
+<div class="badge-popup-overlay" id="badge-popup">
+  <div class="badge-popup">
+    <div class="big-icon" id="badge-popup-icon"></div>
+    <h2 id="badge-popup-title">Badge Earned!</h2>
+    <p class="badge-desc" id="badge-popup-desc"></p>
+    <button class="btn btn-primary" onclick="closeBadgePopup()">Keep Going</button>
+  </div>
+</div>
+
+<!-- ═══════ ENCOURAGEMENT ═══════ -->
+<div class="encouragement" id="encouragement">
+  <div class="enc-title" id="enc-title"></div>
+  <div class="enc-msg" id="enc-msg"></div>
+</div>
+
+<!-- ═══════ BOTTOM NAV ═══════ -->
+<div class="bottom-nav" id="bottom-nav" style="display:none;">
+  <button class="nav-item active" onclick="switchTab('dashboard')" id="nav-dashboard">
+    <span class="nav-icon">🏠</span> Home
+  </button>
+  <button class="nav-item" onclick="switchTab('calendar')" id="nav-calendar">
+    <span class="nav-icon">📅</span> Calendar
+  </button>
+  <button class="nav-item" onclick="switchTab('badges')" id="nav-badges">
+    <span class="nav-icon">🏆</span> Badges
+  </button>
+  <button class="nav-item" onclick="switchTab('settings')" id="nav-settings">
+    <span class="nav-icon">⚙️</span> Settings
+  </button>
+</div>
+
+<!-- ═══════ TOAST ═══════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Bible Verses ──
+  const VERSES = [
+    { text: "No temptation has overtaken you except what is common to mankind. And God is faithful; he will not let you be tempted beyond what you can bear.", ref: "1 Corinthians 10:13" },
+    { text: "Create in me a pure heart, O God, and renew a steadfast spirit within me.", ref: "Psalm 51:10" },
+    { text: "Flee from sexual immorality. Every other sin a person commits is outside the body, but the sexually immoral person sins against his own body.", ref: "1 Corinthians 6:18" },
+    { text: "Blessed are the pure in heart, for they shall see God.", ref: "Matthew 5:8" },
+    { text: "I made a covenant with my eyes not to look lustfully at a young woman.", ref: "Job 31:1" },
+    { text: "Submit yourselves, then, to God. Resist the devil, and he will flee from you.", ref: "James 4:7" },
+    { text: "For the grace of God has appeared that offers salvation to all people. It teaches us to say 'No' to ungodliness and worldly passions.", ref: "Titus 2:11-12" },
+    { text: "Do you not know that your bodies are temples of the Holy Spirit, who is in you, whom you have received from God?", ref: "1 Corinthians 6:19" },
+    { text: "Set your minds on things above, not on earthly things.", ref: "Colossians 3:2" },
+    { text: "Put to death, therefore, whatever belongs to your earthly nature: sexual immorality, impurity, lust, evil desires.", ref: "Colossians 3:5" },
+    { text: "I can do all things through Christ who strengthens me.", ref: "Philippians 4:13" },
+    { text: "But the fruit of the Spirit is love, joy, peace, forbearance, kindness, goodness, faithfulness, gentleness and self-control.", ref: "Galatians 5:22-23" },
+    { text: "Watch and pray so that you will not fall into temptation. The spirit is willing, but the flesh is weak.", ref: "Matthew 26:41" },
+    { text: "The Lord is my strength and my shield; my heart trusts in him, and he helps me.", ref: "Psalm 28:7" },
+    { text: "Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!", ref: "2 Corinthians 5:17" },
+    { text: "Be alert and of sober mind. Your enemy the devil prowls around like a roaring lion looking for someone to devour.", ref: "1 Peter 5:8" },
+    { text: "Whatever is true, whatever is noble, whatever is right, whatever is pure, whatever is lovely — think about such things.", ref: "Philippians 4:8" },
+    { text: "How can a young person stay on the path of purity? By living according to your word.", ref: "Psalm 119:9" },
+    { text: "Forgetting what is behind and straining toward what is ahead, I press on toward the goal.", ref: "Philippians 3:13-14" },
+    { text: "He who began a good work in you will carry it on to completion until the day of Christ Jesus.", ref: "Philippians 1:6" },
+  ];
+
+  // ── Encouragement Messages ──
+  const ENCOURAGEMENTS_GOOD = [
+    "One more day of victory. God sees your faithfulness.",
+    "You're proving it's possible. Keep pressing forward.",
+    "Every day you choose purity, you're rewriting your story.",
+    "The chains are breaking. Don't stop now.",
+    "Heaven is cheering you on. You're not alone in this.",
+    "Discipline today is freedom tomorrow. Well done.",
+    "Your future self will thank you for today's choice.",
+    "This streak isn't just a number — it's a testimony.",
+    "You are more than a conqueror through Christ.",
+    "Consistency is courage. And you showed up today.",
+  ];
+
+  const ENCOURAGEMENTS_FALL = [
+    "A fall is not the end. His mercies are new every morning.",
+    "Peter denied Christ three times — and still became a rock. Get back up.",
+    "God's grace is bigger than your worst day. Start again.",
+    "Shame says 'give up.' Grace says 'try again.' Choose grace.",
+    "The fact that you're honest about it shows your heart is still fighting.",
+    "Relapse is not failure — quitting is. You're still here.",
+    "Even warriors stumble. What matters is that you didn't stay down.",
+    "He doesn't love you less today. Let that truth fuel tomorrow.",
+  ];
+
+  // ── Badges / Milestones ──
+  const BADGES = [
+    { id: 'day1',     name: 'First Step',     icon: '🌱', days: 1,   desc: 'Completed your first clean day.' },
+    { id: 'day3',     name: '3 Day Warrior',   icon: '⚔️', days: 3,   desc: '3 consecutive days of purity.' },
+    { id: 'week1',    name: 'One Week',        icon: '🔥', days: 7,   desc: 'A full week of freedom!' },
+    { id: 'week2',    name: 'Two Weeks',       icon: '💪', days: 14,  desc: '14 days strong. Habits are forming.' },
+    { id: 'week3',    name: 'Three Weeks',     icon: '🛡️', days: 21,  desc: '21 days — a new pattern is being set.' },
+    { id: 'month1',   name: 'One Month',       icon: '⭐', days: 30,  desc: '30 days of walking in freedom.' },
+    { id: 'month2',   name: 'Two Months',      icon: '🌟', days: 60,  desc: '60 days. This is who you are now.' },
+    { id: 'month3',   name: 'Three Months',    icon: '👑', days: 90,  desc: 'A full quarter of purity. Incredible.' },
+    { id: 'month6',   name: 'Six Months',      icon: '🏔️', days: 180, desc: 'Half a year. You are an inspiration.' },
+    { id: 'month9',   name: 'Nine Months',     icon: '🦅', days: 270, desc: '9 months of soaring above temptation.' },
+    { id: 'year1',    name: 'One Year',        icon: '🏆', days: 365, desc: '365 days. A full year redeemed. Glory to God.' },
+  ];
+
+  // ── State ──
+  let appData = loadData();
+  let currentCalMonth = new Date().getMonth();
+  let currentCalYear = new Date().getFullYear();
+
+  function loadData() {
+    const saved = localStorage.getItem('theu_data');
+    if (saved) return JSON.parse(saved);
+    return {
+      setupComplete: false,
+      userName: '',
+      userWhy: '',
+      partners: [],
+      checkedDays: {},   // "YYYY-MM-DD": "clean" | "fell"
+      earnedBadges: {},  // "day1": true
+      shownBadges: {},   // badges already shown as popup
+    };
+  }
+
+  function saveData() {
+    localStorage.setItem('theu_data', JSON.stringify(appData));
+  }
+
+  // ── Init ──
+  function init() {
+    if (appData.setupComplete) {
+      showApp();
+    }
+    updatePartnerList();
+    validateSetupInputs();
+  }
+
+  // ── Setup ──
+  function goToSetupStep(step) {
+    document.querySelectorAll('.setup-step').forEach(s => s.style.display = 'none');
+    const el = document.getElementById('setup-step-' + step);
+    el.style.display = 'block';
+    el.style.animation = 'none';
+    setTimeout(() => el.style.animation = 'fadeIn 0.4s ease', 10);
+  }
+
+  function addPartner() {
+    const name = document.getElementById('partner-name').value.trim();
+    const phone = document.getElementById('partner-phone').value.trim();
+    if (!name || !phone) { showToast('Fill in both fields'); return; }
+    appData.partners.push({ name, phone });
+    saveData();
+    document.getElementById('partner-name').value = '';
+    document.getElementById('partner-phone').value = '';
+    updatePartnerList();
+  }
+
+  function removePartner(index) {
+    appData.partners.splice(index, 1);
+    saveData();
+    updatePartnerList();
+    updateSettingsPartnerList();
+  }
+
+  function updatePartnerList() {
+    const list = document.getElementById('partner-list');
+    const empty = document.getElementById('partner-empty');
+    const btn = document.getElementById('step2-next');
+
+    if (appData.partners.length === 0) {
+      list.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      if (btn) btn.disabled = true;
+    } else {
+      if (empty) empty.style.display = 'none';
+      if (btn) btn.disabled = false;
+      list.innerHTML = appData.partners.map((p, i) => `
+        <div class="partner-chip">
+          <div class="info">
+            <span class="name">${escHtml(p.name)}</span>
+            <span class="phone">${escHtml(p.phone)}</span>
+          </div>
+          <button class="remove" onclick="removePartner(${i})">×</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  function validateSetupInputs() {
+    const nameInput = document.getElementById('user-name');
+    const whyInput = document.getElementById('user-why');
+    const finishBtn = document.getElementById('setup-finish');
+    function check() {
+      if (finishBtn) finishBtn.disabled = !(nameInput.value.trim() && whyInput.value.trim());
+    }
+    if (nameInput) nameInput.addEventListener('input', check);
+    if (whyInput) whyInput.addEventListener('input', check);
+  }
+
+  function completeSetup() {
+    appData.userName = document.getElementById('user-name').value.trim();
+    appData.userWhy = document.getElementById('user-why').value.trim();
+    appData.setupComplete = true;
+    saveData();
+    showApp();
+  }
+
+  // ── App ──
+  function showApp() {
+    document.getElementById('setup-screen').classList.remove('active');
+    document.getElementById('dashboard-screen').classList.add('active');
+    document.getElementById('bottom-nav').style.display = 'flex';
+    updateDashboard();
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(tab + '-screen').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('nav-' + tab).classList.add('active');
+
+    if (tab === 'dashboard') updateDashboard();
+    if (tab === 'calendar') renderCalendar();
+    if (tab === 'badges') renderBadges();
+    if (tab === 'settings') loadSettings();
+  }
+
+  function updateDashboard() {
+    const streak = calculateStreak();
+    document.getElementById('streak-count').textContent = streak.current;
+    document.getElementById('greeting').textContent = getGreeting() + ', ' + (appData.userName || 'Warrior');
+
+    const today = new Date();
+    document.getElementById('today-date').textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    // Check-in status
+    const todayKey = dateKey(today);
+    const area = document.getElementById('checkin-area');
+    const sub = document.getElementById('checkin-subtitle');
+
+    const status = appData.checkedDays[todayKey];
+
+    if (status === 'fell') {
+      // Fell — locked in for the day, show grace message
+      area.innerHTML = `
+        <div class="checkin-done">
+          <div class="done-icon">🙏</div>
+          <div class="done-text">You were honest today. Tomorrow is a new day.</div>
+        </div>`;
+      sub.textContent = 'Checked in for today';
+    } else if (status === 'clean') {
+      // Checked in pure — show confirmation but keep the fall button available
+      area.innerHTML = `
+        <div class="checkin-done" style="margin-bottom:12px;">
+          <div class="done-icon">✅</div>
+          <div class="done-text">You checked in pure today. Keep going!</div>
+        </div>
+        <button class="checkin-btn fail-btn" onclick="checkIn(false)" style="border-color:rgba(248,113,113,0.2);">
+          <span class="checkin-icon">✗</span>
+          <span class="checkin-text">I Fell</span>
+        </button>`;
+      sub.textContent = 'Checked in for today';
+    } else {
+      // Not checked in yet
+      area.innerHTML = `
+        <div class="checkin-buttons">
+          <button class="checkin-btn success-btn" onclick="checkIn(true)">
+            <span class="checkin-icon">✓</span>
+            <span class="checkin-text">Stayed Pure</span>
+          </button>
+          <button class="checkin-btn fail-btn" onclick="checkIn(false)">
+            <span class="checkin-icon">✗</span>
+            <span class="checkin-text">I Fell</span>
+          </button>
+        </div>`;
+      sub.textContent = 'Did you stay pure today?';
+    }
+
+    // Next badge
+    updateNextBadge(streak);
+  }
+
+  function getGreeting() {
+    const h = new Date().getHours();
+    if (h < 12) return 'Morning';
+    if (h < 17) return 'Afternoon';
+    return 'Evening';
+  }
+
+  function checkIn(clean) {
+    const todayKey = dateKey(new Date());
+    appData.checkedDays[todayKey] = clean ? 'clean' : 'fell';
+    saveData();
+    updateDashboard();
+
+    // Show encouragement
+    if (clean) {
+      const msg = ENCOURAGEMENTS_GOOD[Math.floor(Math.random() * ENCOURAGEMENTS_GOOD.length)];
+      showEncouragement('Victory', msg, 'green');
+      // Check for new badges
+      setTimeout(() => checkBadges(), 1500);
+    } else {
+      const msg = ENCOURAGEMENTS_FALL[Math.floor(Math.random() * ENCOURAGEMENTS_FALL.length)];
+      showEncouragement('Grace', msg, 'red');
+    }
+  }
+
+  function showEncouragement(title, msg, color) {
+    const el = document.getElementById('encouragement');
+    document.getElementById('enc-title').textContent = title;
+    document.getElementById('enc-title').className = 'enc-title ' + color;
+    document.getElementById('enc-msg').textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  // ── Streak ──
+  function calculateStreak() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    let current = 0;
+    let best = 0;
+    let total = 0;
+
+    // Count total clean days
+    for (const k in appData.checkedDays) {
+      if (appData.checkedDays[k] === 'clean') total++;
+    }
+
+    // Current streak (consecutive clean days backward)
+    let checkDate = new Date(today);
+    if (appData.checkedDays[dateKey(checkDate)] !== 'clean') {
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+    while (appData.checkedDays[dateKey(checkDate)] === 'clean') {
+      current++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+
+    // Best streak
+    const sortedClean = Object.keys(appData.checkedDays)
+      .filter(k => appData.checkedDays[k] === 'clean')
+      .sort();
+    let temp = 0;
+    for (let i = 0; i < sortedClean.length; i++) {
+      if (i === 0) { temp = 1; }
+      else {
+        const prev = new Date(sortedClean[i-1] + 'T00:00:00');
+        const curr = new Date(sortedClean[i] + 'T00:00:00');
+        temp = ((curr - prev) / 86400000 === 1) ? temp + 1 : 1;
+      }
+      best = Math.max(best, temp);
+    }
+
+    return { current, best, total };
+  }
+
+  // ── Next Badge ──
+  function updateNextBadge(streak) {
+    const card = document.getElementById('next-badge-card');
+    const next = BADGES.find(b => !appData.earnedBadges[b.id]);
+    if (next) {
+      card.style.display = 'block';
+      document.getElementById('next-badge-icon').textContent = next.icon;
+      document.getElementById('next-badge-name').textContent = 'Next: ' + next.name;
+      const remaining = next.days - streak.current;
+      document.getElementById('next-badge-info').textContent =
+        remaining > 0 ? remaining + ' day' + (remaining !== 1 ? 's' : '') + ' to go' : 'Check in to earn!';
+    } else {
+      card.style.display = 'none';
+    }
+  }
+
+  // ── Badges ──
+  function checkBadges() {
+    const streak = calculateStreak();
+    for (const badge of BADGES) {
+      if (streak.current >= badge.days && !appData.earnedBadges[badge.id]) {
+        appData.earnedBadges[badge.id] = true;
+        saveData();
+        if (!appData.shownBadges[badge.id]) {
+          appData.shownBadges[badge.id] = true;
+          saveData();
+          showBadgePopup(badge);
+          return; // show one at a time
+        }
+      }
+    }
+  }
+
+  function showBadgePopup(badge) {
+    document.getElementById('badge-popup-icon').textContent = badge.icon;
+    document.getElementById('badge-popup-title').textContent = badge.name + ' Earned!';
+    document.getElementById('badge-popup-desc').textContent = badge.desc;
+    document.getElementById('badge-popup').classList.add('active');
+  }
+
+  function closeBadgePopup() {
+    document.getElementById('badge-popup').classList.remove('active');
+  }
+
+  function renderBadges() {
+    const grid = document.getElementById('badges-grid');
+    const streak = calculateStreak();
+
+    grid.innerHTML = BADGES.map(b => {
+      const earned = appData.earnedBadges[b.id];
+      return `
+        <div class="badge-item ${earned ? 'earned' : 'locked'}">
+          <div class="badge-icon">${b.icon}</div>
+          <div class="badge-name">${b.name}</div>
+          <div class="badge-days">${b.days} day${b.days !== 1 ? 's' : ''}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Calendar ──
+  function renderCalendar() {
+    const streak = calculateStreak();
+    document.getElementById('cal-current-streak').textContent = streak.current;
+    document.getElementById('cal-best-streak').textContent = streak.best;
+    document.getElementById('cal-total-days').textContent = streak.total;
+
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('calendar-month-label').textContent = months[currentCalMonth] + ' ' + currentCalYear;
+
+    const grid = document.getElementById('calendar-grid');
+    const days = ['S','M','T','W','T','F','S'];
+    let html = days.map(d => `<div class="calendar-day-label">${d}</div>`).join('');
+
+    const firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
+    const daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day empty"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const thisDate = new Date(currentCalYear, currentCalMonth, d);
+      thisDate.setHours(0,0,0,0);
+      const key = dateKey(thisDate);
+      const isToday = thisDate.getTime() === today.getTime();
+      const isFuture = thisDate > today;
+      const status = appData.checkedDays[key];
+
+      let cls = 'calendar-day';
+      if (isToday) cls += ' today';
+      if (isFuture) cls += ' future';
+      if (status === 'clean') cls += ' checked';
+      if (status === 'fell') cls += ' failed';
+
+      html += `<div class="${cls}" ${!isFuture ? `onclick="toggleCalDay('${key}')"` : ''}>${d}</div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  function toggleCalDay(key) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const target = new Date(key + 'T00:00:00');
+    if (target > today) return;
+
+    const current = appData.checkedDays[key];
+    if (!current) appData.checkedDays[key] = 'clean';
+    else if (current === 'clean') appData.checkedDays[key] = 'fell';
+    else delete appData.checkedDays[key];
+
+    saveData();
+    renderCalendar();
+    updateDashboard();
+  }
+
+  function changeMonth(dir) {
+    currentCalMonth += dir;
+    if (currentCalMonth > 11) { currentCalMonth = 0; currentCalYear++; }
+    if (currentCalMonth < 0) { currentCalMonth = 11; currentCalYear--; }
+    renderCalendar();
+  }
+
+  // ── SOS ──
+  function triggerSOS() {
+    const verse = VERSES[Math.floor(Math.random() * VERSES.length)];
+    document.getElementById('sos-verse-text').textContent = '"' + verse.text + '"';
+    document.getElementById('sos-verse-ref').textContent = '— ' + verse.ref;
+    document.getElementById('sos-reason').textContent = appData.userWhy;
+    document.getElementById('sos-modal').classList.add('active');
+    document.getElementById('sos-text-btn').style.display = appData.partners.length > 0 ? 'flex' : 'none';
+  }
+
+  function sendSOSText() {
+    const p = appData.partners[0];
+    const msg = encodeURIComponent(`Hey ${p.name}, I'm struggling right now and could use your prayer and support. - ${appData.userName} (via the U)`);
+    window.location.href = `sms:${p.phone.replace(/\D/g, '')}?&body=${msg}`;
+  }
+
+  function closeSOSModal() {
+    document.getElementById('sos-modal').classList.remove('active');
+  }
+
+  // ── Settings ──
+  function loadSettings() {
+    document.getElementById('settings-name').value = appData.userName;
+    document.getElementById('settings-why').value = appData.userWhy;
+    updateSettingsPartnerList();
+  }
+
+  function updateSettingsPartnerList() {
+    const list = document.getElementById('settings-partner-list');
+    if (appData.partners.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-tertiary); font-size:13px;">No partners yet.</p>';
+    } else {
+      list.innerHTML = appData.partners.map((p, i) => `
+        <div class="partner-chip">
+          <div class="info"><span class="name">${escHtml(p.name)}</span><span class="phone">${escHtml(p.phone)}</span></div>
+          <button class="remove" onclick="removePartner(${i}); updateSettingsPartnerList();">×</button>
+        </div>`).join('');
+    }
+  }
+
+  function saveProfile() {
+    appData.userName = document.getElementById('settings-name').value.trim();
+    appData.userWhy = document.getElementById('settings-why').value.trim();
+    saveData();
+    showToast('Saved');
+  }
+
+  function addPartnerFromSettings() {
+    const name = document.getElementById('settings-partner-name').value.trim();
+    const phone = document.getElementById('settings-partner-phone').value.trim();
+    if (!name || !phone) { showToast('Fill in both fields'); return; }
+    appData.partners.push({ name, phone });
+    saveData();
+    document.getElementById('settings-partner-name').value = '';
+    document.getElementById('settings-partner-phone').value = '';
+    updateSettingsPartnerList();
+    showToast('Partner added');
+  }
+
+  function resetApp() {
+    if (confirm('Are you sure? This will erase ALL your data including your streak.')) {
+      localStorage.removeItem('theu_data');
+      location.reload();
+    }
+  }
+
+  // ── Helpers ──
+  function dateKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function escHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  init();
+</script>
+</body>
+</html>
