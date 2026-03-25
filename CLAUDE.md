@@ -83,6 +83,10 @@ All screens are `<div class="screen">` toggled via JS:
 
 Note: `checkedDays` values changed from `true` to `"clean"` | `"fell"` to support the ✓/✗ check-in system.
 
+## Development Rules
+- **NEVER break existing user data.** When adding new fields to the data structure, always provide fallback defaults (e.g. `appData.newField || []`). Never rename or remove existing fields without migration code. Never change the localStorage key (`theu_data`).
+- **If a change has ANY potential to lose user data, stop and ask the user before proceeding.**
+
 ## Key Design Decisions
 - **SMS via `sms:` protocol** — no backend needed
 - **Check-in has two options** — ✓ (stayed pure) and ✗ (I fell), with different encouragement messages for each
