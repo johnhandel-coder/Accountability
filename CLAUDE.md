@@ -86,6 +86,17 @@ Note: `checkedDays` values changed from `true` to `"clean"` | `"fell"` to suppor
 ## Development Rules
 - **NEVER break existing user data.** When adding new fields to the data structure, always provide fallback defaults (e.g. `appData.newField || []`). Never rename or remove existing fields without migration code. Never change the localStorage key (`theu_data`).
 - **If a change has ANY potential to lose user data, stop and ask the user before proceeding.**
+- **Version every release.** Tag each release with a semantic version (e.g. `v1.0.0`). Add a git tag when pushing to main.
+- **Maintain the changelog.** Every commit to main must have a corresponding entry in the Changelog section below.
+- **Always update CLAUDE.md.** Any feature addition, removal, or structural change must be reflected in this file before committing.
+
+## Current Version
+**v1.0.0** — Initial release (2026-03-25)
+
+## Changelog
+| Version | Date | Changes |
+|---------|------|---------|
+| v1.0.0 | 2026-03-25 | Initial release — setup flow, dashboard with SOS button, check-in (clean/fell) with encouragement, calendar with streak tracking, badge milestones, settings, PWA manifest |
 
 ## Key Design Decisions
 - **SMS via `sms:` protocol** — no backend needed
